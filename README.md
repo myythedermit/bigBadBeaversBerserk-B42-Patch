@@ -64,6 +64,7 @@ Default interval between berserks increased from 2–3 hours to **12–18 hours*
 | `maxInterval` | 18 hrs | Maximum cooldown between berserks |
 | `durationMin` | 3 hrs | Minimum berserk duration |
 | `durationMax` | 6 hrs | Maximum berserk duration |
+| `warCries` | true | Enable/disable periodic war cries + noise |
 
 ## How It Works
 

@@ -17,3 +17,6 @@ option BerserkBeaver.durationMin
 
 option BerserkBeaver.durationMax
 {type = double, min = 0.01, max = 100.00, default = 6, page = BerserkBeaver, translation = BerserkBeaver_durationMax,}
+
+option BerserkBeaver.warCries
+{type = boolean, default = true, page = BerserkBeaver, translation = BerserkBeaver_warCries,}

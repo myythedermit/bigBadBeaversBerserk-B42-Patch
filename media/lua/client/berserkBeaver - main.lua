@@ -166,10 +166,12 @@ function berserkMode.update(player)
         end
 
         -- War cries
-        bd.cryTimer = (bd.cryTimer or 0) + tick
-        if bd.cryTimer >= 0.067 then
-            bd.cryTimer = 0
-            player:SayShout(warCries[ZombRand(1, #warCries+1)])
+        if SandboxVars.BerserkBeaver.warCries then
+            bd.cryTimer = (bd.cryTimer or 0) + tick
+            if bd.cryTimer >= 0.067 then
+                bd.cryTimer = 0
+                player:SayShout(warCries[ZombRand(1, #warCries+1)])
+            end
         end
 
         bd.duration = bd.duration - tick
