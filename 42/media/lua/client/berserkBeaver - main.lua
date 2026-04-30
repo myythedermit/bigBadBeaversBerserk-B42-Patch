@@ -7,12 +7,39 @@ local function statGet(pStats, cs) return pStats:get(cs) end
 local function statSet(pStats, cs, v) pStats:set(cs, v) end
 
 ------------------------------------------------------------
--- Constants
+-- War cry messages (random shouts during berserk)
 ------------------------------------------------------------
-local haloMessages = {"RAGE!", "BLOOD!", "AARRGH!", "DESTROY!", "KILL!", "SMASH!", "DIE!"}
-local warCries = {"RAAAGH!", "COME ON!", "MORE!", "AAAARGH!", "GRAAAH!", "I'LL KILL YOU ALL!"}
+local warCries = {
+    "RAAAGH!",
+    "COME ON!",
+    "MORE!",
+    "AAAARGH!",
+    "GRAAAH!",
+    "I'LL KILL YOU ALL!",
+    "DIE! DIE! DIE!",
+    "YOU CAN'T STOP ME!",
+    "IS THAT ALL YOU GOT?!",
+    "BRING IT ON!",
+    "I'LL RIP YOU APART!",
+    "GET OUT OF MY WAY!",
+    "I'M UNSTOPPABLE!",
+    "BLOOD! MORE BLOOD!",
+    "NOTHING CAN HURT ME!",
+    "COME CLOSER! I DARE YOU!",
+    "RAAAAAAAGH!",
+    "YOU'RE ALL DEAD!",
+    "I'LL TEAR YOU LIMB FROM LIMB!",
+    "NO MERCY!",
+    "FEEL MY WRATH!",
+    "WHO'S NEXT?!",
+    "KEEP COMING!",
+    "I'M NOT DONE YET!",
+    "DESTROY EVERYTHING!",
+}
 
--- Suppress config: built lazily so CharacterStat is available
+------------------------------------------------------------
+-- Suppress config: built lazily so CharacterStat is loaded
+------------------------------------------------------------
 local _sCfg = nil
 local function getSuppress()
     if _sCfg then return _sCfg end
@@ -34,26 +61,6 @@ local function getSuppress()
 end
 
 ------------------------------------------------------------
--- Wound counter helper
-------------------------------------------------------------
-local function countWounds(player)
-    local result = {scratches=0, bites=0, deepWounds=0}
-    local ok, _ = pcall(function()
-        local bd = player:getBodyDamage()
-        local parts = bd:getBodyParts()
-        for i = 0, parts:size() - 1 do
-            local bp = parts:get(i)
-            if bp:scratched() then result.scratches = result.scratches + 1 end
-            if bp:bitten() then result.bites = result.bites + 1 end
-            if bp:deepWounded() then result.deepWounds = result.deepWounds + 1 end
-        end
-    end)
-    return result
-end
-
-
-
-------------------------------------------------------------
 -- Core functions
 ------------------------------------------------------------
 
@@ -64,16 +71,11 @@ function berserkMode.enter(player, berserkData)
     player:SayShout(SandboxVars.BerserkBeaver.message or "BERSERK")
     statSet(player:getStats(), CharacterStat.ANGER, 1)
 
-    -- Init stat buffer and timers
     berserkData.stats = {}
-    berserkData.haloTimer = 0
     berserkData.cryTimer = 0
 
-    -- Save initial temperature (maintain during berserk, not accumulated)
+    -- Save initial temperature (maintain during berserk)
     berserkData.stats.temperature_hold = statGet(player:getStats(), CharacterStat.TEMPERATURE)
-
-    -- Snapshot wounds before berserk
-    berserkData.woundsAtEntry = countWounds(player)
 
     -- Boost combat skills to 10
     berserkData.skills = {}
@@ -124,32 +126,8 @@ function berserkMode.exit(player, berserkData)
                 end
             end
         end
-        -- Temperature: just let game take over naturally (don't dump)
         berserkData.stats = nil
     end
-
-    -- Muscle strain recoil: add a burst of strain post-berserk
-    pcall(function() player:addCombatMuscleStrain(0.5) end)
-    pcall(function() player:addBothArmMuscleStrain(0.3) end)
-    pcall(function() player:addBackMuscleStrain(0.3) end)
-
-    -- Wound awareness: report injuries sustained during berserk
-    local woundsNow = countWounds(player)
-    local entry = berserkData.woundsAtEntry or {scratches=0, bites=0, deepWounds=0}
-    local newScratches = math.max(0, woundsNow.scratches - entry.scratches)
-    local newBites = math.max(0, woundsNow.bites - entry.bites)
-    local newDeep = math.max(0, woundsNow.deepWounds - entry.deepWounds)
-
-    if newScratches > 0 or newBites > 0 or newDeep > 0 then
-        local parts = {}
-        if newScratches > 0 then table.insert(parts, newScratches .. " scratch(es)") end
-        if newBites > 0 then table.insert(parts, newBites .. " bite(s)") end
-        if newDeep > 0 then table.insert(parts, newDeep .. " deep wound(s)") end
-        local msg = "You took " .. table.concat(parts, ", ") .. " during your rage..."
-        player:setHaloNote(msg, 255, 50, 50, 255)
-        if getDebug() then print("[BerserkBeaver] " .. msg) end
-    end
-    berserkData.woundsAtEntry = nil
 end
 
 
@@ -176,9 +154,7 @@ function berserkMode.setOrGetBerserkData(player)
         timeToRage = 0,
         duration = -1,
         ready = false,
-        haloTimer = 0,
         cryTimer = 0,
-        heartbeatTimer = 0,
     }
     berserkMode.rollNextTime(player, pMD.berserkBigBadBeaverData)
     return pMD.berserkBigBadBeaverData
@@ -227,23 +203,12 @@ function berserkMode.update(player)
             end
         end
 
-        -- Note: Muscle strain cannot be negated via API (only additive).
-        -- PAIN suppression already masks strain effects during berserk.
-
         -- Knockdown resistance
         pcall(function()
             if player:isKnockedDown() then player:setKnockedDown(false) end
         end)
 
-        -- Periodic halo text (every ~1.5 minutes)
-        bd.haloTimer = (bd.haloTimer or 0) + tick
-        if bd.haloTimer >= 0.025 then
-            bd.haloTimer = 0
-            local msg = haloMessages[ZombRand(1, #haloMessages + 1)]
-            pcall(function() player:setHaloNote(msg, 255, 30, 30, 255) end)
-        end
-
-        -- Periodic war cries (every ~4 minutes)
+        -- Periodic war cries (every ~4 minutes in-game)
         bd.cryTimer = (bd.cryTimer or 0) + tick
         if bd.cryTimer >= 0.067 then
             bd.cryTimer = 0
@@ -267,13 +232,6 @@ function berserkMode.update(player)
             if getDebug() then print("[BerserkBeaver] Rage accumulated. Awaiting combat...") end
         end
         statSet(player:getStats(), CharacterStat.ANGER, 1)
-
-        -- Heartbeat sound while waiting (every ~10 seconds)
-        bd.heartbeatTimer = (bd.heartbeatTimer or 0) + tick
-        if bd.heartbeatTimer >= 0.003 then
-            bd.heartbeatTimer = 0
-            pcall(function() player:playSound("HeartBeat") end)
-        end
 
     elseif bd.timeToRage > hrs then
         -----------------------------------------------
