@@ -19,8 +19,8 @@ This patch adapts the mod to work with the new Build 42 API while preserving the
 
 1. Download or clone this repository
 2. Copy the `bigBadBeaversBerserk` folder into your Project Zomboid mods directory:
-   - **Linux**: `~/.steam/steam/steamapps/common/ProjectZomboid/mods/`
-   - **Windows**: `C:\Program Files (x86)\Steam\steamapps\common\ProjectZomboid\mods\`
+   - **Linux**: `~/Zomboid/mods/`
+   - **Windows**: `%USERPROFILE%\Zomboid\mods\`
 3. Enable the mod in-game
 
 ## What Changed for B42?
