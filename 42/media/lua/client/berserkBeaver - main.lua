@@ -51,15 +51,7 @@ local function countWounds(player)
     return result
 end
 
-------------------------------------------------------------
--- Muscle strain negation (B42 specific)
-------------------------------------------------------------
-local function negateMuscleStrain(player)
-    pcall(function() player:addCombatMuscleStrain(-1) end)
-    pcall(function() player:addBothArmMuscleStrain(-1) end)
-    pcall(function() player:addBackMuscleStrain(-1) end)
-    pcall(function() player:addNeckMuscleStrain(-1) end)
-end
+
 
 ------------------------------------------------------------
 -- Core functions
@@ -235,8 +227,8 @@ function berserkMode.update(player)
             end
         end
 
-        -- Muscle strain immunity
-        negateMuscleStrain(player)
+        -- Note: Muscle strain cannot be negated via API (only additive).
+        -- PAIN suppression already masks strain effects during berserk.
 
         -- Knockdown resistance
         pcall(function()
