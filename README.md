@@ -66,6 +66,14 @@ BerserkDebug.status()  -- Print current state/timers
 - **Original Mod**: [Big Bad Beaver's Berserk](https://steamcommunity.com/sharedfiles/filedetails/?id=2954181035) by **Chuckleberry Finn**
 - **B42 Adaptation**: This repository
 
+## Takedown / Contact
+
+If you are the original author (**Chuckleberry Finn**) and want this repository removed, please either:
+- Open an [issue](https://github.com/myythedermit/bigBadBeaversBerserk-B42-Patch/issues) on this repo
+- Contact me via [Steam](https://steamcommunity.com/id/myythedermit/) or GitHub DM
+
+The repository will be taken down **immediately**, no questions asked.
+
 ## Legal Notice
 
 This is a fan-made compatibility patch created for personal and community use. The original mod and its concept are the intellectual property of Chuckleberry Finn. This patch is provided as-is with no warranty. **If the original author requests removal, this repository will be taken down immediately.**
