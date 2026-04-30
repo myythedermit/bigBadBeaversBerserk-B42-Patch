@@ -69,6 +69,7 @@ function berserkMode.enter(player, berserkData)
     berserkMode.rollNextDuration(player, berserkData)
     berserkData.ready = false
     player:SayShout(SandboxVars.BerserkBeaver.message or "BERSERK")
+    addSound(player, player:getX(), player:getY(), player:getZ(), 20, 50)
     statSet(player:getStats(), CharacterStat.ANGER, 1)
 
     berserkData.stats = {}
@@ -209,11 +210,13 @@ function berserkMode.update(player)
         end)
 
         -- Periodic war cries (every ~4 minutes in-game)
+        -- Generates noise to attract zombies (same as Q-key shout)
         bd.cryTimer = (bd.cryTimer or 0) + tick
         if bd.cryTimer >= 0.067 then
             bd.cryTimer = 0
             local cry = warCries[ZombRand(1, #warCries + 1)]
             player:SayShout(cry)
+            addSound(player, player:getX(), player:getY(), player:getZ(), 20, 50)
         end
 
         -- Tick down duration
