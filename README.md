@@ -8,7 +8,7 @@
 
 This is a **Build 42.17+ compatibility patch** for the [Big Bad Beaver's Berserk](https://steamcommunity.com/sharedfiles/filedetails/?id=2954181035) mod for Project Zomboid. The original mod only supports Build 41 and does not function on Build 42 due to breaking API changes.
 
-This patch adapts the mod to work with the new Build 42 API while preserving the original gameplay concept.
+This patch adapts the mod to work with the new Build 42 API while adding several gameplay enhancements.
 
 ## Requirements
 
@@ -26,16 +26,47 @@ This patch adapts the mod to work with the new Build 42 API while preserving the
 ## What Changed for B42?
 
 ### API Adaptation
-- **Stats API**: Build 42 removed all individual stat getters/setters (`setAnger()`, `getThirst()`, etc.). Replaced with the new generic `Stats:get(CharacterStat)` / `Stats:set(CharacterStat, float)` API using `CharacterStat.ANGER`, `CharacterStat.THIRST`, etc.
+- **Stats API**: Build 42 removed all individual stat getters/setters (`setAnger()`, `getThirst()`, etc.). Replaced with the new generic `Stats:get(CharacterStat)` / `Stats:set(CharacterStat, float)` API.
 
 ### Gameplay Enhancements
-- **Combat-triggered berserk**: Rage now accumulates over time but is **held** until the player actually strikes a zombie. This makes berserk feel more organic — you snap into rage during combat, not randomly while crafting.
-- **Longer cooldown**: Default interval between berserks increased from 2–3 hours to **12–18 hours** (adjustable via Sandbox Settings).
 
-### Sandbox Settings (unchanged options)
+#### Combat-Triggered Berserk
+Rage now accumulates over time but is **held** until the player actually strikes a zombie. This makes berserk feel more organic — you snap into rage during combat, not randomly while crafting.
+
+#### Expanded Stat Suppression (B42)
+In addition to the original 7 stats, the B42 version now also suppresses during berserk:
+- **Pain** — You don't feel injuries during rage
+- **Discomfort** — No physical complaints
+- **Unhappiness** — Pure rage replaces sadness
+- **Boredom** — Too busy rampaging
+- **Wetness** — Rain? What rain?
+- **Temperature** — Body temperature held stable (maintained at entry value)
+
+All suppressed stats are accumulated and hit you at once when berserk ends (recoil).
+
+#### 💪 Muscle Strain Immunity (B42)
+Build 42's new muscle strain system is negated during berserk — unlimited combat without fatigue. A burst of muscle strain hits after berserk ends.
+
+#### 🩸 Visual Feedback — Halo Text
+Random rage text ("RAGE!", "BLOOD!", "KILL!", etc.) appears above the character's head periodically during berserk.
+
+#### 🔊 Sound Effects
+- **Heartbeat** plays while rage is fully accumulated and waiting for combat trigger
+- **War cries** — Character randomly shouts battle cries during berserk
+
+#### ⚡ Knockdown Resistance
+Character **cannot be knocked down** by zombies during berserk — auto-recovery from any stagger.
+
+#### 🩹 Wound Awareness
+After berserk ends, the mod scans for injuries sustained during the rage and reports them via halo text (e.g., "You took 2 scratch(es), 1 bite(s) during your rage..."). The character only "notices" their wounds after calming down.
+
+#### Longer Cooldown
+Default interval between berserks increased from 2–3 hours to **12–18 hours** (adjustable via Sandbox Settings).
+
+### Sandbox Settings
 | Setting | Default | Description |
 |---------|---------|-------------|
-| `message` | BERSERK | Text the character shouts |
+| `message` | BERSERK | Text the character shouts on activation |
 | `recoilMultiplier` | 1.0 | Multiplier for accrued negative stats |
 | `minInterval` | 12 hrs | Minimum hours between berserks |
 | `maxInterval` | 18 hrs | Maximum hours between berserks |
@@ -45,10 +76,10 @@ This patch adapts the mod to work with the new Build 42 API while preserving the
 ## How It Works
 
 1. **Cooldown** (12–18 hrs) — Anger gradually rises in the last 2 hours
-2. **Rage Ready** — Anger maxed out, character is primed, waiting for combat
+2. **Rage Ready** — Anger maxed, heartbeat plays, waiting for combat
 3. **Combat Trigger** — Player hits a zombie → **BERSERK activates**
-4. **Berserk Active** (3–6 hrs) — All combat skills boosted to 10, negative stats suppressed
-5. **Berserk Ends** — Skills restored, all suppressed stats hit at once (recoil)
+4. **Berserk Active** (3–6 hrs) — Combat skills maxed, all negative stats suppressed, knockdown immune, periodic rage text and war cries
+5. **Berserk Ends** — Skills restored, all suppressed stats hit at once (recoil), muscle strain burst, wound report displayed
 6. Cycle repeats
 
 ## Debug Commands
