@@ -68,9 +68,7 @@ BerserkDebug.status()  -- Print current state/timers
 
 ## Takedown / Contact
 
-If you are the original author (**Chuckleberry Finn**) and want this repository removed, please either:
-- Open an [issue](https://github.com/myythedermit/bigBadBeaversBerserk-B42-Patch/issues) on this repo
-- Contact me via [Steam](https://steamcommunity.com/id/myythedermit/) or GitHub DM
+If you are the original author (**Chuckleberry Finn**) and want this repository removed, please open an [issue](https://github.com/myythedermit/bigBadBeaversBerserk-B42-Patch/issues) on this repo.
 
 The repository will be taken down **immediately**, no questions asked.
 
